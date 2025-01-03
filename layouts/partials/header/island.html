@@ -1,0 +1,282 @@
+<div class="min-h-[148px]"></div>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<div id="island-header"
+  class="fixed rounded-full place-self-center top-4 pl-[24px] pr-[24px] w-full min-w-se max-w-se se:max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl"
+  style="z-index: 100;">
+  <div id="menu-blur"
+    class="absolute rounded-full opacity-0 inset-x-0 h-full nozoom shadow-2xl backdrop-blur-2xl shadow-lg">
+  </div>
+  <div class="relative max-w-[64rem] ml-auto mr-auto">
+    <div style="padding-left:0;padding-right:0;padding-top:2px;padding-bottom:3px"
+      class="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start space-x-3">
+      {{ if .Site.Params.Logo }}
+      {{ $logo := resources.Get .Site.Params.Logo }}
+      {{ if $logo }}
+      <div>
+        <a href="{{ "" | relLangURL }}" class="flex">
+          <span class="sr-only">{{ .Site.Title | markdownify }}</span>
+
+          {{ if eq $logo.MediaType.SubType "svg" }}
+          <span class="logo object-scale-down object-left nozoom">
+            {{ $logo.Content | safeHTML }}
+          </span>
+          {{ else }}
+          <img id="logo-bar" src="{{ $logo.RelPermalink }}" width="{{ div $logo.Width 2 }}"
+            height="{{ div $logo.Height 2 }}"
+            class="logo max-h-[2rem] max-w-[2rem] object-scale-down object-left nozoom" alt="{{ .Site.Title }}" />
+          {{ end }}
+
+        </a>
+      </div>
+      {{ end }}
+      {{- end }}
+      <div id="title-bar-father" class="flex flex-1 items-center justify-between">
+        <nav id="title-bar"  class="hidden se:flex md:ml-7">
+
+          {{ if not .Site.Params.disableTextInHeader | default true }}
+          <a id="page-title-bar" href="{{ "" | relLangURL }}"
+            class="absolute place-self-center text-base font-bold text-gray-500 hover:text-gray-900">{{-
+            .Site.Title | markdownify
+            -}}</a>
+          {{ end }}
+          <a id="article-title-bar" href="{{ "#the-top" }}"
+            class="flex place-self-center text-base md:text-base font-bold text-gray-500 hover:text-gray-900 line-clamp-2">{{-
+            .Title | markdownify
+            -}}
+          </a>
+        </nav>
+        <nav class="space-x-3"></nav>
+        <nav class="main-menu hidden md:flex items-center space-x-5 md:ml-12 h-12">
+            {{ if .Site.Menus.main }}
+            {{ range .Site.Menus.main }}
+            {{ partial "header/header-option.html" . }}
+            {{ end }}
+            {{ end }}
+
+            {{ partial "translations.html" . }}
+
+            {{ if .Site.Params.enableSearch | default false }}
+            <button id="search-button" aria-label="Search"
+              class="text-base hover:text-primary-600 dark:hover:text-primary-400" title="{{ i18n "search.open_button_title" }}">
+              {{ partial "icon.html" "search" }}
+            </button>
+            {{ end }}
+
+          {{/* Appearance switch */}}
+          {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
+          <div
+            class="{{ if .Site.Params.footer.showScrollToTop | default true -}} ltr:mr-14 rtl:ml-14 {{- end }} flex items-center">
+            <button id="appearance-switcher" aria-label="Dark mode switcher" type="button"
+              class="text-base hover:text-primary-600 dark:hover:text-primary-400">
+              <div class="flex items-center justify-center dark:hidden">
+                {{ partial "icon.html" "moon" }}
+              </div>
+              <div class="items-center justify-center hidden dark:flex">
+                {{ partial "icon.html" "sun" }}
+              </div>
+            </button>
+          </div>
+          {{ end }}
+
+        </nav>
+        <div class="flex md:hidden items-center space-x-5 md:ml-12 h-12">
+
+          <span></span>
+
+          {{ partial "translations.html" . }}
+
+          {{ if .Site.Params.enableSearch | default false }}
+          <button id="search-button-mobile" aria-label="Search"
+            class="text-base hover:text-primary-600 dark:hover:text-primary-400" title="{{ i18n "search.open_button_title" }}">
+            {{ partial "icon.html" "search" }}
+          </button>
+          {{ end }}
+
+          {{/* Appearance switch */}}
+          {{ if .Site.Params.footer.showAppearanceSwitcher | default false }}
+          <button id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button"
+            class="text-base hover:text-primary-600 dark:hover:text-primary-400" style="margin-right:5px">
+            <div class="flex items-center justify-center dark:hidden">
+              {{ partial "icon.html" "moon" }}
+            </div>
+            <div class="items-center justify-center hidden dark:flex">
+              {{ partial "icon.html" "sun" }}
+            </div>
+          </button>
+          {{ end }}
+
+        </div>
+      </div>
+      <div class="-my-2 -mr-2 md:hidden">
+
+        <label id="menu-button" class="block">
+          {{ if .Site.Menus.main }}
+          <div class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+            {{ partial "icon.html" "bars" }}
+          </div>
+          <div id="menu-wrapper" style="padding-top:5px;"
+            class="fixed inset-0 z-30 invisible w-screen h-screen m-0 overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50">
+            <ul
+              class="flex space-y-2 mt-3 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
+
+              <li id="menu-close-button">
+                <span
+                  class="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400">{{
+                  partial
+                  "icon.html"
+                  "xmark" }}</span>
+              </li>
+
+              {{ range .Site.Menus.main }}
+
+              {{ partial "header/header-mobile-option.html" . }}
+
+              {{ end }}
+
+            </ul>
+            {{ if .Site.Menus.subnavigation }}
+            <hr>
+            <ul
+              class="flex mt-4 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
+
+
+              {{ range .Site.Menus.subnavigation }}
+              <li class="mb-1">
+                <a href="{{ .URL }}" {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+                  target="_blank" {{ end }} class="flex items-center">
+                  {{ if .Pre }}
+                  <span {{ if and .Pre .Name}} class="mr-3" {{ end }}>
+                    {{ partial "icon.html" .Pre }}
+                  </span>
+                  {{ end }}
+                  <p class="text-sm font-sm text-gray-500 hover:text-gray-900" title="{{ .Title }}">
+                    {{ .Name | markdownify }}
+                  </p>
+                </a>
+              </li>
+              {{ end }}
+
+            </ul>
+            {{ end }}
+            {{ end }}
+
+          </div>
+        </label>
+      </div>
+    </div>
+
+    {{ if .Site.Menus.subnavigation }}
+    <div class="main-menu flex pb-3 flex-col items-end justify-between md:justify-start space-x-3" {{ if
+      .Site.Params.Logo }} style="margin-top:-15px" {{ end }}>
+      <div class="hidden md:flex items-center space-x-5">
+        {{ range .Site.Menus.subnavigation }}
+        <a href="{{ .URL }}" {{ if or (strings.HasPrefix .URL "http:" ) (strings.HasPrefix .URL "https:" ) }}
+          target="_blank" {{ end }} class="flex items-center">
+          {{ if .Pre }}
+          <span {{ if and .Pre .Name}} class="mr-1" {{ end }}>
+            {{ partial "icon.html" .Pre }}
+          </span>
+          {{ end }}
+          <p class="text-xs font-light text-gray-500 hover:text-gray-900" title="{{ .Title }}">
+            {{ .Name | markdownify }}
+          </p>
+        </a>
+        {{ end }}
+      </div>
+    </div>
+    {{ end }}
+
+    {{ if .Site.Params.highlightCurrentMenuArea }}
+    <script>
+      (function () {
+        var $mainmenu = $('.main-menu');
+        var path = window.location.pathname;
+        $mainmenu.find('a[href="' + path + '"]').each(function (i, e) {
+          $(e).children('p').addClass('active');
+        });
+      })();
+    </script>
+    {{ end }}
+
+  </div>
+</div>
+
+<script>
+  // const title_bar_father = document.getElementById("title-bar-father");
+  // var title_bar_fatherDistance = title_bar_father.getBoundingClientRect(); // 获取元素的位置信息
+  // // 获取 title_bar 宽度，限制 page-title-bar 和 article-title-bar 的最大宽度
+  // var title_bar_width = title_bar_fatherDistance.width;
+
+  // const page_title_bar = document.getElementById("page-title-bar");
+  // const article_title_bar = document.getElementById("article-title-bar");
+
+  // page_title_bar.style.maxWidth = title_bar_width + "px";
+  // article_title_bar.style.maxWidth = title_bar_width + "px";
+
+  let lastScrollTop = 0;
+  let lastScrollDirection = 0;
+  let island_header_style_top = 1;
+  let accumulated_scroll = 0;
+  let isArticleTitleVisible = false;
+
+  window.addEventListener("scroll", function (e) {
+    
+    const scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    let currScrollDirection = scroll - lastScrollTop > 0 ? 1 : -1; // 1 for down, -1 for up
+    const title_bar = document.getElementById("title-bar");
+    const background_blur = document.getElementById("menu-blur");
+    const island_header = document.getElementById("island-header");
+    
+    const heading = document.querySelector("h1");
+    const headingDistance = heading.getBoundingClientRect(); // 获取元素的位置信息
+    const headingOffset = headingDistance.bottom + scroll;
+    const threshold = headingOffset * 2 / 3;
+    // console.log("scroll", scroll, "headingOffset", headingOffset, "threshold", threshold);
+
+    background_blur.style.opacity = scroll / headingOffset;
+
+    if (scroll > headingOffset) {
+      
+      if (currScrollDirection !== lastScrollDirection) {
+        accumulated_scroll = 0;
+      } else {
+        accumulated_scroll += Math.abs(scroll - lastScrollTop);
+      }
+
+      if ((accumulated_scroll > threshold || currScrollDirection == -1)&&(scroll > headingOffset + threshold / 2)) {
+        island_header_style_top = Math.max(
+          -4.5,
+          Math.min(
+            1,
+            (island_header_style_top - (scroll - lastScrollTop) / 18)
+        ));
+
+        island_header.style.top = island_header_style_top + "rem";
+      }
+
+      // 标题和菜单切换逻辑
+      if (heading && window.location.pathname !== "/") {
+        
+        const switchPoint = headingOffset - threshold; // 切换点
+        const restorePoint = headingOffset; // 恢复点
+
+        if (currScrollDirection === 1 && scroll > switchPoint && !isArticleTitleVisible) {
+          title_bar.classList.add("title-switched");
+          isArticleTitleVisible = true;
+        } else if (currScrollDirection === -1 && scroll < restorePoint && isArticleTitleVisible) {
+          title_bar.classList.remove("title-switched");
+          isArticleTitleVisible = false;
+        }
+      }
+    } else {
+      // 滚动到顶部时重置
+      title_bar.classList.remove("title-switched");
+      isArticleTitleVisible = false;
+    }
+    lastScrollTop = scroll;
+    lastScrollDirection = currScrollDirection;
+  });
+
+
+</script>

@@ -27,12 +27,6 @@
     {{- with .OutputFormats.Get "RSS" -}}
     {{ printf "<atom:link href=%q rel=\"self\" type=%q />" .Permalink .MediaType | safeHTML }}
     {{- end -}}
-    {{ if and (.Site.Params.rssnext.feedId) (.Site.Params.rssnext.userId) }}
-    <follow_challenge>
-      <feedId>{{ .Site.Params.rssnext.feedId }}</feedId>
-      <userId>{{ .Site.Params.rssnext.userId }}</userId>
-    </follow_challenge>
-    {{ end }}
     {{ range $pages }}
     <item>
       <title>{{ .Title }}</title>
@@ -40,7 +34,7 @@
       <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
       {{ with .Site.Params.Author.email }}<author>{{.}}{{ with $.Site.Params.Author.name }} ({{.}}){{end}}</author>{{end}}
       <guid>{{ .Permalink }}</guid>
-      <description>{{ .Summary | html }}</description>
+      <description>{{ .Content | html }}</description>
       {{ range ( where .Site.RegularPages ".RelPermalink" .RelPermalink | first 1 ) }}
         {{- $images := .Resources.ByType "image" -}}
         {{- $featured := $images.GetMatch "*feature*" -}}

@@ -1,0 +1,149 @@
+{{ define "main" }}
+{{ .Scratch.Set "scope" "single" }}
+
+<article>
+    {{ if .Params.showHero | default (.Site.Params.article.showHero | default false) }}
+    {{ $heroStyle := .Params.heroStyle }}
+    {{ if not $heroStyle }}{{ $heroStyle = .Site.Params.article.heroStyle }}{{ end }}
+    {{ $heroStyle := print "partials/hero/" $heroStyle ".html" }}
+    {{ if templates.Exists $heroStyle }}
+    {{ partial $heroStyle . }}
+    {{ else }}
+    {{ partial "partials/hero/basic.html" . }}
+    {{ end }}
+    {{ end }}
+
+    <header id="single_header" class="mt-5 max-w-prose">
+        {{ if .Params.showBreadcrumbs | default (.Site.Params.article.showBreadcrumbs | default false) }}
+        {{ partial "breadcrumbs.html" . }}
+        {{ end }}
+        <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+            {{ .Title | emojify }}
+        </h1>
+
+
+        {{ $authorsData := .Site.Data.authors }}
+        {{ $taxonomies := .Site.Taxonomies.authors }}
+        {{ $baseURL := .Site.BaseURL }}
+        {{ $taxonomyLink := 0 }}
+        {{ $showAuthor := 0 }}
+
+        {{ if not (strings.HasSuffix $baseURL "/") }}
+        {{ $baseURL = delimit (slice $baseURL "/") "" }}
+        {{ end }}
+
+
+
+    </header>
+    <div class="hidden md:flex flex-wrap gap-4 max-w-full mt-4 ">
+        <!-- 加载 front matter 中的 friend link -->
+        {{ with .Params.links }}
+        {{ range . }}
+        <!-- 逐个读取 name, url, image, description -->
+
+        <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+        <a href="{{ .url }}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-110 transition duration-300 border border-neutral-200 dark:border-neutral-700 border-2 bg-neutral-100/50 backdrop-blur-2xl dark:bg-neutral-900/50">
+            <div class="flex items-center space-x-2 h-18 max-w-[12rem]">
+                <img src="{{ .logo }}" alt="{{ .name }} Logo" class="logo w-16 h-16 rounded-full flex-shrink-0 nozoom shadow-lg">
+                <div class="grow min-w-0 items-center text-left">
+                    <div class="text-base mt-1 font-extrabold text-neutral-800 dark:text-neutral-200 transition duration-300 truncate block">
+                        {{ .name }}
+                    </div>
+                    <p class="text-sm text-neutral-800 dark:text-neutral-300 mt-1 line-clamp-2">{{ .description }}
+                    </p>
+                </div>
+            </div>
+        </a>
+        {{ end }}
+        {{ end }}
+    </div>
+    <div class="flex flex-wrap md:hidden gap-4 max-w-full mt-4 ">
+        <!-- 加载 front matter 中的 friend link -->
+        {{ with .Params.links }}
+        {{ range . }}
+        <!-- 逐个读取 name, url, image, description -->
+
+        <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+        <a href="{{ .url }}" target="_blank" rel="noopener noreferrer" class="w-fit p-4 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-110 transition duration-300 border border-neutral-200 dark:border-neutral-700 border-2 bg-neutral-100/50 backdrop-blur-2xl dark:bg-neutral-900/50">
+            <div class="flex items-center space-x-2 h-10">
+                <img src="{{ .logo }}" alt="{{ .name }} Logo" class="w-12 h-12 rounded-full flex-shrink-0 nozoom">
+                <div class="grow min-w-0 items-center text-left">
+                    <div class="text-lg font-extrabold text-neutral-800 dark:text-neutral-200 transition duration-300 truncate block">
+                        {{ .name }}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {{ end }}
+        {{ end }}
+    </div>
+
+    <section class="flex flex-col mt-0 prose dark:prose-invert mt-4">
+
+
+
+        <div class="min-w-0 min-h-0 max-w-fit">
+
+
+
+            <div class="article-content max-w-full mb-20">
+                {{ .Content }}
+                {{ $defaultReplyByEmail := .Site.Params.replyByEmail }}
+                {{ $replyByEmail := default $defaultReplyByEmail .Params.replyByEmail }}
+                {{ if $replyByEmail }}
+                <strong class="block mt-8">
+                    <a target="_blank"
+                        class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
+                        href="mailto:{{ .Site.Params.Author.email }}?subject={{ replace (printf " Reply to %s"
+                        .Title) "\"" "'" }}">
+                Reply by Email
+              </a>
+            </strong>
+          {{ end }}
+        </div>
+        
+        {{ if (.Params.showAuthorBottom | default ( .Site.Params.article.showAuthorBottom | default false)) }}
+
+          {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
+            {{ $showAuthor = 1 }}
+            {{ partial "author.html" . }}
+          {{ end }}
+
+          {{ range $author := .Page.Params.authors }}
+            {{ $authorData := index $authorsData $author }}
+            {{- if $authorData -}}
+              {{ range $taxonomyname, $taxonomy := $taxonomies }}
+                {{ if (eq $taxonomyname $author) }}
+                  {{ $taxonomyLink = delimit (slice $baseURL "authors/" $author "/") "" }}
+                {{ end }}
+              {{ end }}
+              {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
+            {{- end -}}
+          {{ end }}
+
+          {{ if or $taxonomyLink $showAuthor }}
+          <div class="mb-10"></div>
+          {{ end }}
+
+        {{ end }}
+      </div>
+  
+    </section>
+  <footer class="pt-8 max-w-prose print:hidden">
+
+    {{ partial "article-pagination.html" . }}
+    {{ if .Params.showComments | default (.Site.Params.article.showComments | default false) }}
+    {{ if templates.Exists "partials/comments.html" }}
+    <div class="pt-3">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="pt-3">
+        {{ partial "comments.html" . }}
+      </div>
+    </div>
+    {{ else }}
+    {{ warnf "[BLOWFISH] Comments are enabled for %s but no comments partial exists." .File.Path }}
+    {{ end }}
+    {{ end }}
+  </footer>
+</article>
+{{ end }}

@@ -4,7 +4,7 @@
   {{ else }}
   <a href="{{ .RelPermalink }}" class="min-w-full">
     {{ end }}
-    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
+    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded-2xl overflow-hidden shadow-2xl relative">
 
       {{- with $.Params.images -}}
       {{- range first 6 . }}
@@ -65,7 +65,7 @@
 
         {{ if .Params.showSummary | default (.Site.Params.list.showSummary | default false) }}
         <div class="py-1 prose dark:prose-invert">
-          {{ .Summary | plainify }}
+          {{ .Summary }}
         </div>
         {{ end }}
       </div>
